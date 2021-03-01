@@ -1,17 +1,35 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Container from "@material-ui/core/Container";
+import { StateMachineProvider, createStore } from "little-state-machine";
+import { DevTool } from "little-state-machine-devtools";
+import { BrowserRouter as Router } from "react-router-dom";
+
+createStore({
+  pizza: {
+    size: '',
+    border: '',
+    taste: '',
+    points: 0
+  }
+})
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+  <>
+    <CssBaseline />
+    <StateMachineProvider>
+      <DevTool />
+      <Container maxWidth="xl">
+        <h1>Monte sua pizza</h1>
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+        <Router>
+          <App />
+        </Router>
+      </Container>
+    </StateMachineProvider>
+  </>,
+  document.getElementById("root")
+);
