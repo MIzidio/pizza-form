@@ -12,8 +12,11 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "^5.1.7",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
     "little-state-machine": "^4.1.0",
     "little-state-machine-devtools": "^2.0.0",
+    "nodemon": "^2.0.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-hook-form": "^6.15.4",
@@ -26,7 +29,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "nodemon ./server/index.js"
   },
   "eslintConfig": {
     "extends": [

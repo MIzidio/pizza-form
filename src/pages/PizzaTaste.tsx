@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useStateMachine } from "little-state-machine";
 import { updateAction } from "../actions/updateAction";
 import { useForm } from "react-hook-form";
@@ -15,17 +15,17 @@ interface FormValues {
   taste: string;
 }
 
-const tastes = [
-  { label: "Frango", value: "frango", id: 1 },
-  { label: "Carne", value: "carne", id: 2 },
-  { label: "Mussarela", value: "mussarela", id: 3 },
-  { label: "Calabresa", value: "calabresa", id: 4 },
-];
+interface TasteType {
+  label: string;
+  value: string;
+  id: number;
+}
 
 const PizzaTaste: React.FC<{}> = () => {
   const { state, actions } = useStateMachine({ updateAction });
   const { register, handleSubmit } = useForm<FormValues>();
   const [value, setValue] = useState<string>(state.pizza.taste);
+  const [tastes, setTastes] = useState<TasteType[] | null>(null);
   const { push } = useHistory();
   const onSubmit = (data: FormValues) => {
     actions.updateAction(data);
@@ -40,14 +40,24 @@ const PizzaTaste: React.FC<{}> = () => {
     push("/step1");
   };
 
+  const getData = async () => {
+    const data = await fetch("http://localhost:8000/taste");
+    const result = await data.json();
+    setTastes(result);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
-    <Container maxWidth='xs'>
+    <Container maxWidth="xs">
       <form onSubmit={handleSubmit(onSubmit)}>
         <h2>Escolha o sabor da pizza</h2>
         <FormControl component="fieldset">
           <FormLabel component="legend">Bordas</FormLabel>
           <RadioGroup name="taste" value={value} onChange={handleChange}>
-            {tastes.map((taste) => (
+            {tastes?.map((taste) => (
               <FormControlLabel
                 value={taste.value}
                 control={<Radio required />}

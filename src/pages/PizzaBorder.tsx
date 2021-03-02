@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import { useStateMachine } from "little-state-machine";
@@ -16,16 +16,16 @@ interface FormValues {
   border: string;
 }
 
-const borders = [
-  { label: "Sem recheio", value: "sem recheio", id: 1 },
-  { label: "Recheio de chocolate", value: "chocolate", id: 2 },
-  { label: "Recheio de catupiry", value: "catupiry", id: 3 },
-  { label: "Recheio de cream cheese", value: "cream cheese", id: 4 },
-];
+interface BorderType {
+    label: string;
+    value: string;
+    id: number;
+}
 
 const PizzaBorder: React.FC<{}> = () => {
   const { state, actions } = useStateMachine({ updateAction });
   const { handleSubmit, register } = useForm<FormValues>();
+  const [borders, setBorders] = useState<BorderType[] | null>(null)
   const [value, setValue] = useState<string>(state.pizza.border);
   const { push } = useHistory();
 
@@ -41,6 +41,16 @@ const PizzaBorder: React.FC<{}> = () => {
     setValue((e.target as HTMLInputElement).value);
   };
 
+  const getData = async () => {
+    const data = await fetch("http://localhost:8000/border");
+    const result = await data.json();
+    setBorders(result);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <Container maxWidth='xs'>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -48,7 +58,7 @@ const PizzaBorder: React.FC<{}> = () => {
         <FormControl component="fieldset">
           <FormLabel component="legend">Bordas</FormLabel>
           <RadioGroup name="border" value={value} onChange={handleChange}>
-            {borders.map((border) => (
+            {borders?.map((border) => (
               <FormControlLabel
                 value={border.value}
                 control={<Radio required />}

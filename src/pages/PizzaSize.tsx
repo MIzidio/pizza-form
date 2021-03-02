@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useStateMachine } from "little-state-machine";
 import { updateAction } from "../actions/updateAction";
 import { useForm } from "react-hook-form";
@@ -15,17 +15,17 @@ interface FormValues {
   size: string;
 }
 
-const sizes = [
-  { label: "Mini (4 pedaços)", value: "mini", id: 1 },
-  { label: "Pequena (6 pedaços)", value: "pequena", id: 2 },
-  { label: "Média (8 pedaços)", value: "media", id: 3 },
-  { label: "Grande (10 pedaços)", value: "grande", id: 4 },
-];
+interface SizeTypes {
+    label: string;
+    value: string;
+    id: number
+}
 
 const PizzaSize: React.FC<{}> = () => {
   const { state, actions } = useStateMachine({ updateAction });
   const { register, handleSubmit } = useForm<FormValues>();
   const [value, setValue] = useState<string>(state.pizza.size);
+  const [sizes, setSizes] = useState<SizeTypes[] | null>(null)
   const { push } = useHistory();
   const onSubmit = (data: FormValues) => {
     actions.updateAction(data);
@@ -37,8 +37,18 @@ const PizzaSize: React.FC<{}> = () => {
   };
 
   const onClickBack = () => {
-    push("/step1");
+    push("/");
   };
+
+  const getData = async () => {
+    const data = await fetch("http://localhost:8000/size");
+    const result = await data.json();
+    setSizes(result);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <Container maxWidth='xs'>
@@ -47,7 +57,7 @@ const PizzaSize: React.FC<{}> = () => {
         <FormControl component="fieldset">
           <FormLabel component="legend">Tamanhos</FormLabel>
           <RadioGroup name="size" value={value} onChange={handleChange}>
-            {sizes.map((size) => (
+            {sizes?.map((size) => (
               <FormControlLabel
                 value={size.value}
                 control={<Radio required />}

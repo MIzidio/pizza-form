@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useStateMachine } from "little-state-machine";
 import { updateAction } from "../actions/updateAction";
@@ -9,23 +9,28 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
 
-const TodayPizza = {
-  size: { label: "Grande (10 pedaços)", value: "grande" },
-  border: { label: "Recheio de chocolate", value: "chocolate" },
-  taste: { label: "Frango", value: "frango" },
-  points: 100,
-};
+interface pieceType {
+    label: string;
+    value: string;
+}
+interface TodayPizzaType {
+    size: pieceType;
+    border: pieceType;
+    taste: pieceType;
+    points: number;
+}
 
 const PizzaOfTheDay: React.FC<{}> = () => {
   const { actions } = useStateMachine({ updateAction });
+  const [todayPizza, setTodayPizza] = useState<TodayPizzaType | null>(null);
   const { push } = useHistory();
 
   const onSelectTodaysPizza = () => {
     actions.updateAction({
-      size: TodayPizza.size.value,
-      border: TodayPizza.border.value,
-      taste: TodayPizza.taste.value,
-      points: TodayPizza.points,
+      size: todayPizza?.size.value,
+      border: todayPizza?.border.value,
+      taste: todayPizza?.taste.value,
+      points: todayPizza?.points,
     });
     push("/result");
   };
@@ -33,22 +38,32 @@ const PizzaOfTheDay: React.FC<{}> = () => {
     push("/step1");
   };
 
+  const getData = async () => {
+      const data = await fetch('http://localhost:8000/day');
+      const result = await data.json();
+      setTodayPizza(result);
+  }
+
+  useEffect(() => {
+     getData();
+  }, [])
+
   return (
     <Container maxWidth='xs'>
       <h2>Pizza do dia:</h2>
       <List component="nav" dense>
         <ListItem>
-          <ListItemText primary={`Tamanho: ${TodayPizza.size.label}`} />
+          <ListItemText primary={`Tamanho: ${todayPizza?.size.label}`} />
         </ListItem>
         <ListItem>
-          <ListItemText primary={`Borda: ${TodayPizza.border.label}`} />
+          <ListItemText primary={`Borda: ${todayPizza?.border.label}`} />
         </ListItem>
         <ListItem>
-          <ListItemText primary={`Sabor: ${TodayPizza.taste.label}`} />
+          <ListItemText primary={`Sabor: ${todayPizza?.taste.label}`} />
         </ListItem>
         <ListItem>
           <ListItemText
-            primary={`Pontos de benefício ganhos: ${TodayPizza.points}`}
+            primary={`Pontos de benefício ganhos: ${todayPizza?.points}`}
           />
         </ListItem>
       </List>
